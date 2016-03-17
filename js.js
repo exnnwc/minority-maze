@@ -1,16 +1,30 @@
 world_x = 50;
 world_y = 30;
+  
 function displayWorld(){
+    if(!typeof hostiles_x === "undefined"){
+        console.log(hostiles_x, hostiles_y);
+    }
     world="";
     for(y=1;y<world_y;y++){
         world = world + "<div>";
         for (x=1;x<world_x;x++){
-            world = world + "<span class='cell'>";
-            if (is_there_an_other_here(x, y)) {
-                world = world + "X";
+            other_here=is_there_an_other_here(x, y);
+            hostile_here= is_there_a_hostile_here(x,y);
+            world = world + "<span class='cell ";
+            if (other_here){
+                world = world + " other";
+            } else if (hostile_here){
+                world = world + " hostile";
+            }
+            world = world + "'>";
+            if (other_here) {
+                world = world + "@";
             } else if (x===player_x && y===player_y){
                 world = world + "O";
-            } 
+            } else if (hostile_here){
+                world = world + "X";
+            }
             
             world = world + "</span>";
         }
@@ -30,6 +44,13 @@ function spawn_queen(){
     queen_y = queen_coord["y"];
 
 }
+hostiles_x=[];
+hostiles_y=[];
+function spawn_hostile(x, y){
+    hostiles_x.push(x);
+    hostiles_y.push(y);
+    console.log("hostile spawned at (" + x + ", " + y + ")");
+}
 function spawn_point(){
     while (true){
         rand_x = randomNum(1,world_x);
@@ -40,19 +61,50 @@ function spawn_point(){
     }
     
 }
-function move(direction){
-    console.log(direction);
-    if (direction === "Left" && player_x>1  && !is_there_an_other_here(player_x-1, player_y)){
-        player_x--;
-    } else if (direction === "Right" && player_x<world_x  && !is_there_an_other_here(player_x + 1, player_y)){
-        player_x++;
-    } else if (direction === "Up" && player_y>1 && !is_there_an_other_here(player_x, player_y-1)){
-        player_y--;
-    } else if (direction === "Down" && player_y<world_y-1 && !is_there_an_other_here(player_x, player_y+1)){
-        player_y++;
+function move(direction, holdingShift){
+    if (direction === "Left" && player_x>1){
+        other_there = is_there_an_other_here(player_x-1, player_y);
+        if (!other_there){
+            player_x--;
+        } else if (other_there && holdingShift && player_x>2 && !is_there_an_other_here(player_x-2, player_y)){
+            kill_other(player_x-1, player_y);
+            spawn_hostile(player_x-1, player_y);
+            player_x-=2;
+        }
+    
+    } else if (direction === "Right" && player_x<world_x){
+        other_there = is_there_an_other_here(player_x + 1, player_y);
+        if (!other_there){
+            player_x++;
+        } else if (other_there && holdingShift){
+            kill_other(player_x+1, player_y);
+            spawn_hostile(player_x+1, player_y);
+            player_x+=2;
+        }
+
+    } else if (direction === "Up" && player_y>1){
+        other_there = is_there_an_other_here(player_x, player_y-1);
+        if (!other_there){
+            player_y--;
+        } else if (other_there && holdingShift){
+            kill_other(player_x, player_y-1);
+            spawn_hostile(player_x, player_y-1);
+            player_y-=2;
+        }
+
+    } else if (direction === "Down" && player_y<world_y-1){
+        other_there = is_there_an_other_here(player_x, player_y+1);
+        if(!other_there){
+            player_y++;
+        } else if (other_there && holdingShift){
+            kill_other(player_x, player_y+1);
+            spawn_hostile(player_x, player_y+1);
+            player_y+=2;
+        }
+
     }
     displayWorld();
-    console.log(player_x, player_y);
+    //console.log(player_x, player_y);
 }
 
 function randomNum(a, b){
@@ -76,6 +128,15 @@ function populate_with_others(){
         }
     }
 }
+function kill_other(x, y){
+    for(other=0;other<others_x.length;other++){
+        if (x==others_x[other] && y==others_y[other]){
+            others_x.splice(other, 1);
+            others_y.splice(other, 1);
+        }
+    }
+
+}
 function is_there_an_other_here(x, y){
     for(other=0;other<others_x.length;other++){
         if (others_x[other]===x && others_y[other]===y){
@@ -83,4 +144,37 @@ function is_there_an_other_here(x, y){
         }
     } 
     return false;
+}
+function is_there_a_hostile_here(x,y){
+    if (typeof hostiles_x === "undefined"){
+        return false;
+    }
+    for(hostile=0;hostile<hostiles_x.length;hostile++){
+        if (hostiles_x[hostile]===x && hostiles_y[hostile]===y){
+            return true;
+        }
+    } 
+    return false;
+}
+
+
+function whats_here(x,y){
+    if (is_there_an_other_here(x,y)){
+        return 1;
+    } else if(is_there_a_hostile_here(x,y)){
+        return 2;
+    }
+    return 0;
+}
+
+function move_hostiles(){
+    for(hostile=0;hostile<hostiles_x.length;hostile++){
+        randDirection=randomNum(1,4);
+        //1 - up, 2 - right, 3 - down, 4 - left
+        if (randDirection==4 && whats_here(hostiles_x[hostile]-1, hostiles_y[hostile])==0){
+
+        } else if (randDirection==2 && whats_here(hostiles_x[hostile]-1, hostiles_y[hostile])==0){
+
+        }
+    }
 }

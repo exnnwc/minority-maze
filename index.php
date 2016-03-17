@@ -7,6 +7,13 @@
             width:20px;
             height:20px;
             border:1px solid black;
+            text-align:center;
+        }
+        .other{
+            color:grey;
+        }
+        .hostile{
+            color:red;
         }
         div{
             clear:both;
@@ -18,12 +25,14 @@
         $(document.body).ready(function () {
             $(document).on("keypress", "body", function (event) {
                 if (event.key.substr(0,5)=="Arrow"){
-                   move(event.key.substr(5, (event.key.length-5)));
+                   move(event.key.substr(5, (event.key.length-5)), event.shiftKey);
                 }
             });
         populate_with_others();
         spawn_player();
         displayWorld();
+            setInterval(
+            moveHostiles(), 1000);
         });
     </script>
 </head>
