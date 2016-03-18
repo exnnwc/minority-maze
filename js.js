@@ -62,6 +62,7 @@ function spawn_point(){
     
 }
 function move(direction, holdingShift){
+//	console.log(direction, holdingShift);
     if (direction === "Left" && player_x>1){
         other_there = is_there_an_other_here(player_x-1, player_y);
         if (!other_there){
@@ -166,15 +167,29 @@ function whats_here(x,y){
     }
     return 0;
 }
-
-function move_hostiles(){
+function kill_hostile(x,y){
     for(hostile=0;hostile<hostiles_x.length;hostile++){
+        if (x==hostiles_x[other] && y==hostiles_y[other]){
+            hostiles_x.splice(other, 1);
+            hostiles_y.splice(other, 1);
+        }
+    }	
+}
+function move_hostiles(){
+	if (hostiles_x.length>0){
+		console.log(hostiles_x);
+	}
+    for(hostile=0;hostile<hostiles_x.length;hostile++){
+		
         randDirection=randomNum(1,4);
+		console.log(hostiles_x[hostile], hostiles_y[hostile], hostile, randDirection);
+		console.log(hostiles_x[hostile]-1, hostiles_y[hostile], whats_here(hostiles_x[hostile]-1, hostiles_y[hostile]), hostile, randDirection);
         //1 - up, 2 - right, 3 - down, 4 - left
-        if (randDirection==4 && whats_here(hostiles_x[hostile]-1, hostiles_y[hostile])==0){
-
-        } else if (randDirection==2 && whats_here(hostiles_x[hostile]-1, hostiles_y[hostile])==0){
-
+        if (randDirection==4 ){
+			console.log(hostiles_x[hostile]-1, hostiles_y[hostile], whats_here(hostiles_x[hostile]-1, hostiles_y[hostile]), hostile, randDirection);
+        } else if (randDirection==2){
+			
         }
     }
+	displayWorld();
 }

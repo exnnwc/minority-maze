@@ -23,17 +23,24 @@
     <script src="js.js"></script>
     <script>
         $(document.body).ready(function () {
-            $(document).on("keypress", "body", function (event) {
-                if (event.key.substr(0,5)=="Arrow"){
-                   move(event.key.substr(5, (event.key.length-5)), event.shiftKey);
-                }
+			$(document).on("keydown", "body", function (event) {
+                direction = {37:"Left", 38:"Up", 39:"Right", 40:"Down"}
+				if (event.keyCode>36 && event.keyCode<41){
+                   move(direction[event.keyCode], event.shiftKey);
+				}
+                
             });
         populate_with_others();
         spawn_player();
         displayWorld();
-            setInterval(
-            moveHostiles(), 1000);
-        });
+		x=0;
+		setInterval(function(){
+		move_hostiles();
+		if (x>5){
+			return;
+		}
+		}, 1000);
+		});
     </script>
 </head>
 
