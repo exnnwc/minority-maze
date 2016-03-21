@@ -21,11 +21,11 @@
     </style>
     <script src="http://localhost/rla/js/jquery-2.1.4.min.js"></script>
 	<script src="Game.js"></script>
+	<script src="Hostiles.js"></script>
 	<script src="js.js"></script>
-    <script src="world.js"></script>
 	<script src="Others.js"></script>
 	<script src="Player.js"></script>
-	
+    <script src="World.js"></script>
     <script>
         $(document.body).ready(function () {
 			game = new Game();
@@ -33,6 +33,7 @@
                 direction = {37:"Left", 38:"Up", 39:"Right", 40:"Down"}
 				if (event.keyCode>36 && event.keyCode<41){
                    game.movePlayer(direction[event.keyCode], event.shiftKey);				   
+                    game.moveHostiles();
 				}
                 
             });

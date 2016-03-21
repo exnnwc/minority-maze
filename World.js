@@ -19,27 +19,22 @@ function displayWorld (){
 	for(y=1;y<this.sizeOfY;y++){		
 		worldString = worldString + "<div>";
 		for (x=1;x<this.sizeOfX;x++){
-			//other_here=is_there_an_other_here(x, y);
-			//hostile_here= is_there_a_hostile_here(x,y);
-			worldString = worldString + "<span class='cell ";
+			worldString = worldString + "<span title='("+x+", "+y+")' class='cell ";
 			
 			if (this.map[x][y]==2){
 				worldString = worldString + " other";
-			} 
-			/*else if (hostile_here){
+			} else if (this.map[x][y]==3){
 				worldString = worldString + " hostile";
-			}*/
+			}
 			worldString = worldString + "'>";
 			if (this.map[x][y]==1){
 				worldString = worldString + "O";
 			} else if (this.map[x][y]==2){
 
 				worldString = worldString + "@";
-			}  
-			/* else if (hostile_here){
+			} else if (this.map[x][y]==3){
 				worldString = worldString + "X";
-			}*/
-			
+			}
 			worldString = worldString + "</span>";
 		}
 		worldString = worldString + "</div>";
