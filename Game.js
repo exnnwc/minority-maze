@@ -1,7 +1,8 @@
 function Game(){
 	this.movePlayer=movePlayer;
     this.moveHostiles=moveHostiles;
-	this.world = new World(50, 25);
+	this.gameOver=gameOver;
+	this.world = new World(25, 25);
 	this.maxNumOfOthers = this.world.sizeOfX * this.world.sizeOfY * (50/100);		
 
 
@@ -24,8 +25,12 @@ function Game(){
 	
 	this.world.display();
 }
-
+function gameOver(){
+	alert("Game over!");
+}
 function movePlayer(direction, holdingShift){
+	this.moveHostiles();
+
     if (direction === "Left" && this.player.pos["x"]>1){
 		if (this.world.map[this.player.pos["x"]-1][this.player.pos["y"]]==0){			
 			this.world.map[this.player.pos["x"]-1][this.player.pos["y"]]=1;				
@@ -79,11 +84,29 @@ function movePlayer(direction, holdingShift){
 			this.player.move({x:this.player.pos["x"], y:this.player.pos["y"]+2});
         }
 	}
+
 	this.world.display();
 }
 
 function moveHostiles(){
     for(hostile=0;hostile<this.hostiles.locations.length;hostile++){
-        openNeighbors=listOpenNeighbors(this.hostiles.locations[hostile]);
+		randomNeighbor=this.world.randomNonOther(this.hostiles.locations[hostile]);
+		if (this.world.map[randomNeighbor["x"]][randomNeighbor["y"]]==0){
+			this.world.map[this.hostiles.locations[hostile]["x"]][this.hostiles.locations[hostile]["y"]]=0;
+			this.hostiles.move(hostile, randomNeighbor);
+			this.world.map[this.hostiles.locations[hostile]["x"]][this.hostiles.locations[hostile]["y"]]=3;
+		} else if (this.world.map[randomNeighbor["x"]][randomNeighbor["y"]]==1){
+
+		} else if (this.world.map[randomNeighbor["x"]][randomNeighbor["y"]]==3){
+			console.log("HOSTILES #" + hostile + " " + this.hostiles.locations[hostile]);
+			
+			randomOther=this.world.randomOther(this.hostiles.locations[hostile]);
+			if (randomOther!==false){
+				this.world.map[randomOther["x"]][randomOther["y"]]=3;
+				this.hostiles.add(randomOther);
+			}
+		}
+		
+		
     }    
 }

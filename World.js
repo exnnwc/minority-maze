@@ -1,9 +1,12 @@
 function World (sizeOfX, sizeOfY){
 	this.sizeOfX = sizeOfX;
 	this.sizeOfY = sizeOfY;
+
 	this.display = displayWorld;
 	this.randomSpawnPoint = randomSpawnPoint;
-
+	this.neighbors = listNeighbors;
+	this.randomNonOther = fetchRandomNonOther;
+	this.randomOther = fetchRandomOther;
 	var map = new Array(new Array());
 	for(x=0;x<this.sizeOfX;x++){
 		map.push([]);
@@ -53,5 +56,53 @@ function randomSpawnPoint(){
         }
     }
     
+}
+
+function listNeighbors(location){		
+	neighbors=new Array();
+	for(x=location["x"]-1;x<=location["x"]+1;x++){
+		for(y=location["y"]-1;y<=location["y"]+1;y++){
+			if (typeof this.map[x][y]!=="undefined" && !(x==location["x"] && y==location["y"])){
+				neighbors.push({x:x, y:y});
+			}
+		}
+	}
+	return neighbors;
+}
+
+function fetchRandomNonOther(location){
+	neighbors=this.neighbors(location);
+	
+	tries=0;
+	while(tries<neighbors.length*neighbors.length){
+		randomNumber=randomNum(0, neighbors.length-1);
+		if (this.map[neighbors[randomNumber]["x"]][neighbors[randomNumber]["y"]]!=2){
+			tries=1000;
+		}
+		tries++;
+	}
+	return neighbors[randomNumber];
+}
+
+function fetchRandomOther(location){	
+	neighbors=this.neighbors(location);	
+	otherFound=false;
+	for(neighbor=0;neighbor<neighbors.length;neighbor++){
+		if (this.map[neighbors[neighbor]["x"]][neighbors[neighbor]["y"]]==2){
+			otherFound=true;
+		}
+	}
+	if (!otherFound){
+		return false;
+	}
+	tries=0;
+	while(tries<neighbors.length*neighbors.length){
+		randomNumber=randomNum(0, neighbors.length-1);
+		if (this.map[neighbors[randomNumber]["x"]][neighbors[randomNumber]["y"]]==2){
+			tries=1000;
+		}
+		tries++;
+	}
+	return neighbors[randomNumber];
 }
 

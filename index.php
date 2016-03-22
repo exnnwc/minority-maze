@@ -33,7 +33,7 @@
                 direction = {37:"Left", 38:"Up", 39:"Right", 40:"Down"}
 				if (event.keyCode>36 && event.keyCode<41){
                    game.movePlayer(direction[event.keyCode], event.shiftKey);				   
-                    game.moveHostiles();
+                    
 				}
                 
             });
