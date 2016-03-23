@@ -3,7 +3,9 @@ function World (sizeOfX, sizeOfY){
 	this.sizeOfY = sizeOfY;
 
 	this.display = displayWorld;
+	this.okayForTheQueen = isItOkayForTheQueen;
 	this.randomSpawnPoint = randomSpawnPoint;
+	this.farSpawn = fetchFarSpawn;
 	this.neighbors = listNeighbors;
 	this.randomNonOther = fetchRandomNonOther;
 	this.randomOther = fetchRandomOther;
@@ -28,6 +30,8 @@ function displayWorld (){
 				worldString = worldString + " other";
 			} else if (this.map[x][y]==3){
 				worldString = worldString + " hostile";
+			} else if (this.map[x][y]==4){
+				worldString = worldString + " queen";
 			}
 			worldString = worldString + "'>";
 			if (this.map[x][y]==1){
@@ -37,6 +41,8 @@ function displayWorld (){
 				worldString = worldString + "@";
 			} else if (this.map[x][y]==3){
 				worldString = worldString + "X";
+			} else if (this.map[x][y]==4){
+				worldString = worldString + "Q";
 			}
 			worldString = worldString + "</span>";
 		}
@@ -48,6 +54,7 @@ function displayWorld (){
 
 
 function randomSpawnPoint(){
+	
     while (true){
         rand_x = randomNum(1, this.sizeOfX-1);
         rand_y = randomNum(1, this.sizeOfY-1); 
@@ -58,11 +65,33 @@ function randomSpawnPoint(){
     
 }
 
+function isItOkayForTheQueen(location){
+	openSpots=0;
+	if (this.map[location["x"]+1][location["y"]]==0){
+		openSpots++;
+	}
+	if (this.map[location["x"]-1][location["y"]]==0){
+		openSpots++;
+	}
+	if (this.map[location["x"]][location["y"]+1]==0){
+		openSpots++;
+	}
+	if (this.map[location["x"]][location["y"]-1]==0){
+		openSpots++;
+	}
+	if (openSpots>2){
+		return true;
+	}
+	return false;
+}
 function listNeighbors(location){		
 	neighbors=new Array();
 	for(x=location["x"]-1;x<=location["x"]+1;x++){
 		for(y=location["y"]-1;y<=location["y"]+1;y++){
-			if (typeof this.map[x][y]!=="undefined" && !(x==location["x"] && y==location["y"])){
+			if (x>0 && x<this.sizeOfX && y>0 && this.sizeOfY 
+			&& typeof this.map[x][y]!=="undefined" 
+			&& !(x==location["x"] 
+			&& y==location["y"])){
 				neighbors.push({x:x, y:y});
 			}
 		}
@@ -70,6 +99,21 @@ function listNeighbors(location){
 	return neighbors;
 }
 
+function fetchFarSpawn(location){
+
+	min_dist_from_player = Math.floor(Math.sqrt(this.sizeOfX * this.sizeOfY));
+	tries=0;
+	while (tries<this.sizeOfX*this.sizeOfY){
+		spawn=this.randomSpawnPoint();
+		distance=Math.sqrt(Math.pow((spawn["x"]-location["x"]),2)+Math.pow((spawn["y"]-location["y"]), 2));
+		if (distance > min_dist_from_player){
+			return spawn;
+		}
+		tries++;		
+	}
+	return false;
+	
+}
 function fetchRandomNonOther(location){
 	neighbors=this.neighbors(location);
 	
