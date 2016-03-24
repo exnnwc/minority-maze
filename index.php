@@ -22,8 +22,12 @@
 			color:black;
 			background-color:green;
 		}
+		.baby{
+			color:green;
+		}
     </style>
     <script src="http://localhost/rla/js/jquery-2.1.4.min.js"></script>
+	<script src="Babies.js"></script>
 	<script src="Game.js"></script>
 	<script src="Hostiles.js"></script>
 	<script src="js.js"></script>

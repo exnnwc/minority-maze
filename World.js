@@ -32,9 +32,11 @@ function displayWorld (){
 				worldString = worldString + " hostile";
 			} else if (this.map[x][y]==4){
 				worldString = worldString + " queen";
+			} else if (this.map[x][y]==5){
+				worldString = worldString + " baby";
 			}
 			worldString = worldString + "'>";
-			if (this.map[x][y]==1){
+			if (this.map[x][y]==1 ){
 				worldString = worldString + "O";
 			} else if (this.map[x][y]==2){
 
@@ -43,6 +45,8 @@ function displayWorld (){
 				worldString = worldString + "X";
 			} else if (this.map[x][y]==4){
 				worldString = worldString + "Q";
+			} else if (this.map[x][y]==5){
+				worldString = worldString + "o";
 			}
 			worldString = worldString + "</span>";
 		}
