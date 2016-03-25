@@ -2,18 +2,25 @@
 <html>
 <head>
     <style>
+		#world_div{
+			
+		}
         .cell{
             float:left;
             width:20px;
             height:20px;
-            border:1px solid black;
+            border:1px dotted grey;
             text-align:center;
         }
         .other{
-            color:grey;
+            background-color:lightgrey;
         }
+		.empty{
+			border:1px dotted white;
+		}
         .hostile{
             color:red;
+			border:1px dotted white;
         }
         div{
             clear:both;
@@ -24,6 +31,10 @@
 		}
 		.baby{
 			color:green;
+			border:1px dotted white;
+		}
+		.player {
+			border:1px dotted white;
 		}
     </style>
     <script src="http://localhost/rla/js/jquery-2.1.4.min.js"></script>
@@ -52,6 +63,7 @@
 
 <body>
 <div id='world_div'></div>
+<div id='status_div'></div>
 </body>
 
 </html>

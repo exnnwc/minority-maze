@@ -9,7 +9,6 @@ function createBaby(location){
 }
 
 function moveBaby(baby, location){	
-	console.log("MOVING BABY #" + baby + " to ", location);
 	this.locations[baby]=location;
 }
 

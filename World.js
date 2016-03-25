@@ -7,8 +7,10 @@ function World (sizeOfX, sizeOfY){
 	this.randomSpawnPoint = randomSpawnPoint;
 	this.farSpawn = fetchFarSpawn;
 	this.neighbors = listNeighbors;
+	this.neighborsStatus = neighborsStatus;
 	this.randomNonOther = fetchRandomNonOther;
 	this.randomOther = fetchRandomOther;
+	this.randomOpen = fetchRandomOpen;
 	var map = new Array(new Array());
 	for(x=0;x<this.sizeOfX;x++){
 		map.push([]);
@@ -25,8 +27,22 @@ function displayWorld (){
 		worldString = worldString + "<div>";
 		for (x=1;x<this.sizeOfX;x++){
 			worldString = worldString + "<span title='("+x+", "+y+")' class='cell ";
+			if (x===1){
+				worldString = worldString + " world-left";
+			} else if (x===this.sizeOfX-1){
+				worldString = worldString + " world-right";
+			}
 			
-			if (this.map[x][y]==2){
+			if (y===1){
+				worldString = worldString + " world-up";
+			} else if (y===this.sizeOfY-1){
+				worldString = worldString + " world-down";
+			}
+			if (this.map[x][y]==0){
+				worldString = worldString + " empty";
+			} else if (this.map[x][y]==1){
+				worldString = worldString + " player";
+			} else if (this.map[x][y]==2){
 				worldString = worldString + " other";
 			} else if (this.map[x][y]==3){
 				worldString = worldString + " hostile";
@@ -40,13 +56,13 @@ function displayWorld (){
 				worldString = worldString + "O";
 			} else if (this.map[x][y]==2){
 
-				worldString = worldString + "@";
+				worldString = worldString + "";
 			} else if (this.map[x][y]==3){
-				worldString = worldString + "X";
+				worldString = worldString + "&Delta;";
 			} else if (this.map[x][y]==4){
-				worldString = worldString + "Q";
+				worldString = worldString + "";
 			} else if (this.map[x][y]==5){
-				worldString = worldString + "o";
+				worldString = worldString + "O";
 			}
 			worldString = worldString + "</span>";
 		}
@@ -88,7 +104,8 @@ function isItOkayForTheQueen(location){
 	}
 	return false;
 }
-function listNeighbors(location){		
+function listNeighbors(location){
+	console.log(location);
 	neighbors=new Array();
 	for(x=location["x"]-1;x<=location["x"]+1;x++){
 		for(y=location["y"]-1;y<=location["y"]+1;y++){
@@ -103,6 +120,18 @@ function listNeighbors(location){
 	return neighbors;
 }
 
+function neighborsStatus(location){
+	console.log(location);
+	neighbors=this.neighbors(location);
+	neighborStatus=[];
+	for (i=0;i<10;i++){
+		neighborStatus.push(0);
+	}
+	for (neighbor=0;neighbor<neighbors.length;neighbor++){
+		neighborStatus[this.map[neighbors[neighbor]["x"]][neighbors[neighbor]["y"]]]++;
+	}
+	return neighborStatus;
+}
 function fetchFarSpawn(location){
 
 	min_dist_from_player = Math.floor(Math.sqrt(this.sizeOfX * this.sizeOfY));
@@ -153,4 +182,24 @@ function fetchRandomOther(location){
 	}
 	return neighbors[randomNumber];
 }
-
+function fetchRandomOpen(location){	
+	neighbors=this.neighbors(location);	
+	openFound=false;
+	for(neighbor=0;neighbor<neighbors.length;neighbor++){
+		if (this.map[neighbors[neighbor]["x"]][neighbors[neighbor]["y"]]==0){
+			openFound=true;
+		}
+	}
+	if (!openFound){
+		return false;
+	}
+	tries=0;
+	while(tries<neighbors.length*neighbors.length){
+		randomNumber=randomNum(0, neighbors.length-1);
+		if (this.map[neighbors[randomNumber]["x"]][neighbors[randomNumber]["y"]]==0){
+			tries=1000;
+		}
+		tries++;
+	}
+	return neighbors[randomNumber];
+}

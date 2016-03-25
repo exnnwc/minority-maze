@@ -6,13 +6,17 @@ function Game(){
 	this.gameOver=gameOver;
 	this.generateWorld=generateWorld;
 	this.queenTouched=queenTouched;
-	
+	this.updateStatus=updateStatus;
+
 	validQueenSpawn=false;
 	this.generateWorld();
-	
+	this.updateStatus();
 	this.world.display();
 }
 function beginGeneratingWorld(){
+	this.num_of_moves=0;
+	time = new Date();
+	this.begin_time=time.getTime();
 	this.world = new World(50, 25);
 	this.maxNumOfOthers = this.world.sizeOfX * this.world.sizeOfY * (50/100);		
 	this.others = new Others()        
@@ -47,7 +51,7 @@ function generateWorld(){
 				this.world.map[this.queen.pos["x"]][this.queen.pos["y"]]=4;				
 				this.babies = new Babies();
 				for(i=0;i<20;i++){
-					this.babies.add(this.world.randomSpawnPoint());
+					//this.babies.add(this.world.randomSpawnPoint());
 				}
 			}
 		} else if (queenSpawn===false){
@@ -62,10 +66,16 @@ function generateWorld(){
 
 	}
 }
+function updateStatus(){
+	time = new Date();
+	duration = time.getTime()-this.begin_time;
+	$("#status_div").html("Move:" + this.num_of_moves + " Time:" + Math.floor(duration/1000) 
+		+ " Hostiles:" + this.hostiles.locations.length + " Friendlies:" + this.babies.locations.length);
+}
 function movePlayer(direction, holdingShift){
-
+	this.num_of_moves++;
+	this.updateStatus();
     if (direction === "Left" && this.player.pos["x"]>1){
-		console.log(this.world.map[this.player.pos["x"]-1][this.player.pos["y"]]);
 		if (this.world.map[this.player.pos["x"]-1][this.player.pos["y"]]==0){			
 			this.world.map[this.player.pos["x"]-1][this.player.pos["y"]]=1;				
 			this.world.map[this.player.pos["x"]][this.player.pos["y"]]=0;
@@ -87,13 +97,11 @@ function movePlayer(direction, holdingShift){
 		} else if (this.world.map[this.player.pos["x"]-1][this.player.pos["y"]]==5){
 			this.world.map[this.player.pos["x"]-1][this.player.pos["y"]]=1;				
 			this.world.map[this.player.pos["x"]][this.player.pos["y"]]=5;			
-			console.log(this.player.pos["x"]-1, this.player.pos["y"], this.player.pos);
 			this.babies.move(this.babies.whosAt(this.player.pos["x"]-1, this.player.pos["y"]), this.player.pos);
 			this.player.move({x:this.player.pos["x"]-1, y:this.player.pos["y"]});
 			this.moveHostiles();
 		}
 	} else  if (direction === "Right" && this.player.pos["x"]<this.world.sizeOfX){
-		console.log(this.world.map[this.player.pos["x"]+1][this.player.pos["y"]]);
 		if (this.world.map[this.player.pos["x"]+1][this.player.pos["y"]]==0){			
 			this.world.map[this.player.pos["x"]+1][this.player.pos["y"]]=1;				
 			this.world.map[this.player.pos["x"]][this.player.pos["y"]]=0;
@@ -115,13 +123,11 @@ function movePlayer(direction, holdingShift){
 		} else if (this.world.map[this.player.pos["x"]+1][this.player.pos["y"]]==5){	
 			this.world.map[this.player.pos["x"]+1][this.player.pos["y"]]=1;				
 			this.world.map[this.player.pos["x"]][this.player.pos["y"]]=5;		
-			console.log(this.player.pos["x"]+1, this.player.pos["y"], this.player.pos);
 			this.babies.move(this.babies.whosAt(this.player.pos["x"]+1, this.player.pos["y"]), this.player.pos);			
 			this.player.move({x:this.player.pos["x"]+1, y:this.player.pos["y"]});
 			this.moveHostiles();
 		}
 	} else if (direction === "Up" && this.player.pos["y"]>1){
-		console.log(this.world.map[this.player.pos["x"]][this.player.pos["y"]-1]);
 		if (this.world.map[this.player.pos["x"]][this.player.pos["y"]-1]==0){			
 			this.world.map[this.player.pos["x"]][this.player.pos["y"]-1]=1;				
 			this.world.map[this.player.pos["x"]][this.player.pos["y"]]=0;
@@ -144,13 +150,11 @@ function movePlayer(direction, holdingShift){
 		} else if (this.world.map[this.player.pos["x"]][this.player.pos["y"]-1]==5){			
 			this.world.map[this.player.pos["x"]][this.player.pos["y"]-1]=1;				
 			this.world.map[this.player.pos["x"]][this.player.pos["y"]]=5;
-			console.log(this.player.pos["x"], this.player.pos["y"]-1, this.player.pos)
 			this.babies.move(this.babies.whosAt(this.player.pos["x"], this.player.pos["y"]-1), this.player.pos);			
 			this.player.move({x:this.player.pos["x"], y:this.player.pos["y"]-1});
 			this.moveHostiles();
 		}
 	} else if (direction === "Down" && this.player.pos["y"]<this.world.sizeOfY){
-		console.log(this.world.map[this.player.pos["x"]][this.player.pos["y"]+1]);
 		if (this.world.map[this.player.pos["x"]][this.player.pos["y"]+1]==0){			
 			this.world.map[this.player.pos["x"]][this.player.pos["y"]+1]=1;				
 			this.world.map[this.player.pos["x"]][this.player.pos["y"]]=0;
@@ -169,10 +173,9 @@ function movePlayer(direction, holdingShift){
 			this.gameOver();
 		} else if (this.world.map[this.player.pos["x"]][this.player.pos["y"]+1]==4){
 			this.queenTouched();
-		} else if (this.world.map[this.player.pos["x"]][this.player.pos["y"]-1]==5){			
+		} else if (this.world.map[this.player.pos["x"]][this.player.pos["y"]+1]==5){			
 			this.world.map[this.player.pos["x"]][this.player.pos["y"]+1]=1;				
 			this.world.map[this.player.pos["x"]][this.player.pos["y"]]=5;
-			console.log(this.player.pos["x"], this.player.pos["y"]+1, this.player.pos);
 			this.babies.move(this.babies.whosAt(this.player.pos["x"], this.player.pos["y"]+1), this.player.pos);			
 			this.player.move({x:this.player.pos["x"], y:this.player.pos["y"]+1});
 			this.moveHostiles();
@@ -203,23 +206,31 @@ function moveBabies(){
 
 function moveHostiles(){
     for(hostile=0;hostile<this.hostiles.locations.length;hostile++){
-		randomNeighbor=this.world.randomNonOther(this.hostiles.locations[hostile]);
-		if (this.world.map[randomNeighbor["x"]][randomNeighbor["y"]]==0){
-			this.world.map[this.hostiles.locations[hostile]["x"]][this.hostiles.locations[hostile]["y"]]=0;
-			this.hostiles.move(hostile, randomNeighbor);
-			this.world.map[this.hostiles.locations[hostile]["x"]][this.hostiles.locations[hostile]["y"]]=3;
-		} else if (this.world.map[randomNeighbor["x"]][randomNeighbor["y"]]==1){
+		thisHostileNeighbors = this.world.neighborsStatus(this.hostiles.locations[hostile]);
+		if (thisHostileNeighbors[3]>3){
+				this.hostiles.kill(this.hostiles.locations[hostile]["x"], this.hostiles.locations[hostile]["y"]);				
+		} else if (thisHostileNeighbors[1]>0 || (thisHostileNeighbors[3]>=1 && thisHostileNeighbors[3]<=3)){
+			randomNeighbor=this.world.randomNonOther(this.hostiles.locations[hostile]);
+			if (this.world.map[randomNeighbor["x"]][randomNeighbor["y"]]==0){
+				this.world.map[this.hostiles.locations[hostile]["x"]][this.hostiles.locations[hostile]["y"]]=0;
+				this.hostiles.move(hostile, randomNeighbor);
+				this.world.map[this.hostiles.locations[hostile]["x"]][this.hostiles.locations[hostile]["y"]]=3;
+			} else if (this.world.map[randomNeighbor["x"]][randomNeighbor["y"]]==1){
 
-		} else if (this.world.map[randomNeighbor["x"]][randomNeighbor["y"]]==3 && randomNum(1,8)==1){
-			/*	
-			randomOther=this.world.randomOther(this.hostiles.locations[hostile]);
-			if (randomOther!==false){
-				this.world.map[randomOther["x"]][randomOther["y"]]=3;
-				this.hostiles.add(randomOther);
+			} else if (this.world.map[randomNeighbor["x"]][randomNeighbor["y"]]==3){
+				otherHostileNeighbors = this.world.neighborsStatus(randomNeighbor);
+				
+				
+				if (otherHostileNeighbors[0]+thisHostileNeighbors[3]>5){
+					randomOpen=this.world.randomOpen(this.hostiles.locations[hostile]);
+					if (randomOpen!==false){
+						this.world.map[randomOpen["x"]][randomOpen["y"]]=3;
+						this.hostiles.add(randomOpen);
+					}
+				} 
+				
 			}
-			*/
 		}
-		
 		
     }    
 }
