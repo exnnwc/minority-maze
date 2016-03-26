@@ -62,8 +62,14 @@
 </head>
 
 <body>
+
 <div id='world_div'></div>
-<div id='status_div'></div>
+<div id='status_div' style='margin-bottom:16px;'></div>
+<div style='float:right; text-align:right;'>
+<div >Press arrow keys to move. </div>
+<div>Press shift to jump over a block.</div>
+<div>Green is good. Red is bad.</div>
+</div>
 <div id="game_over_div" style='top:150px;left:30px;z-indez:10;position:absolute;color:red;font-size:160px;display:none;'>GAME OVER</div>
 <div id="win_div" style='top:150px;left:120px;z-indez:10;position:absolute;font-size:160px;display:none;'>YOU WIN!</div>
 </body>
