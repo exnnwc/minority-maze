@@ -13,10 +13,8 @@ function moveBaby(baby, location){
 }
 
 function whosAt(x, y){
-	console.log(x, y);
 	for(baby=0;baby<this.locations.length;baby++){		
         if (this.locations[baby]["x"]==x && this.locations[baby]["y"]==y){
-			console.log(baby);
 			return baby;
         }
     }

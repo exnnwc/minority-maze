@@ -35,7 +35,7 @@ function beginGeneratingWorld(){
     }
 }
 function gameOver(){
-	alert("Game over!");
+	$("#game_over_div").show();
 	this.isActive=false;
 }
 
@@ -50,8 +50,11 @@ function generateWorld(){
 				this.queen = new Queen (queenSpawn);
 				this.world.map[this.queen.pos["x"]][this.queen.pos["y"]]=4;				
 				this.babies = new Babies();
+				
 				for(i=0;i<20;i++){
-					//this.babies.add(this.world.randomSpawnPoint());
+					//randomSpawn = this.world.randomSpawnPoint();
+					//this.babies.add(randomSpawn);
+					//this.world.map[randomSpawn["x"]][randomSpawn["y"]]=5;
 				}
 			}
 		} else if (queenSpawn===false){
@@ -66,15 +69,11 @@ function generateWorld(){
 
 	}
 }
-function updateStatus(){
-	time = new Date();
-	duration = time.getTime()-this.begin_time;
-	$("#status_div").html("Move:" + this.num_of_moves + " Time:" + Math.floor(duration/1000) 
-		+ " Hostiles:" + this.hostiles.locations.length + " Friendlies:" + this.babies.locations.length);
-}
+
 function movePlayer(direction, holdingShift){
 	this.num_of_moves++;
 	this.updateStatus();
+	
     if (direction === "Left" && this.player.pos["x"]>1){
 		if (this.world.map[this.player.pos["x"]-1][this.player.pos["y"]]==0){			
 			this.world.map[this.player.pos["x"]-1][this.player.pos["y"]]=1;				
@@ -186,21 +185,43 @@ function movePlayer(direction, holdingShift){
 
 function moveBabies(){
     for(baby=0;baby<this.babies.locations.length;baby++){
-		randomNeighbor=this.world.randomNonOther(this.babies.locations[baby]);
-		if (this.world.map[randomNeighbor["x"]][randomNeighbor["y"]]==0){
-			this.world.map[this.babies.locations[baby]["x"]][this.babies.locations[baby]["y"]]=0;
-			this.babies.move(baby, randomNeighbor);
-			this.world.map[this.babies.locations[baby]["x"]][this.babies.locations[baby]["y"]]=5;
-		} else if (this.world.map[randomNeighbor["x"]][randomNeighbor["y"]]==1){
+		whichWayToGo=this.world.findHostiles(this.babies.locations[baby]);
+		if (whichWayToGo!==false){
+			if (whichWayToGo==="e"){
+				newX=this.babies.locations[baby]["x"]+1;
+				newY=this.babies.locations[baby]["y"];
+			} else if (whichWayToGo=="n"){
+				newX=this.babies.locations[baby]["x"];
+				newY=this.babies.locations[baby]["y"]-1;
+			} else if (whichWayToGo=="s"){
+				newX=this.babies.locations[baby]["x"];
+				newY=this.babies.locations[baby]["y"]+1;
+			} else if (whichWayToGo==="w"){
+				newX=this.babies.locations[baby]["x"]-1;
+				newY=this.babies.locations[baby]["y"];
+			}
 
-		} else if (this.world.map[randomNeighbor["x"]][randomNeighbor["y"]]==3){
-			console.log ("KILL HOSTILE @ " + randomNeighbor);
-			this.hostiles.kill(randomNeighbor["x"], randomNeighbor["y"]);
-			this.world.map[randomNeighbor["x"]][randomNeighbor["y"]]=0;
 			
-		}
-		
-		
+			if (this.world.map[newX][newY]===3){		
+				this.hostiles.kill(newX, newY);				
+			}
+			this.world.map[newX][newY]=5;			
+			this.world.map[this.babies.locations[baby]["x"]][this.babies.locations[baby]["y"]]=0;
+			this.babies.move(baby, {x:newX, y:newY});
+		} else if (whichWayToGo===false){
+			randomNeighbor=this.world.randomNonOther(this.babies.locations[baby]);
+			if (this.world.map[randomNeighbor["x"]][randomNeighbor["y"]]==0){
+				this.world.map[this.babies.locations[baby]["x"]][this.babies.locations[baby]["y"]]=0;
+				this.babies.move(baby, randomNeighbor);
+				this.world.map[this.babies.locations[baby]["x"]][this.babies.locations[baby]["y"]]=5;
+			} else if (this.world.map[randomNeighbor["x"]][randomNeighbor["y"]]==1){
+
+			} else if (this.world.map[randomNeighbor["x"]][randomNeighbor["y"]]==3){
+				this.hostiles.kill(randomNeighbor["x"], randomNeighbor["y"]);
+				this.world.map[randomNeighbor["x"]][randomNeighbor["y"]]=0;
+				
+			}
+		}		
     }    
 }
 
@@ -208,8 +229,10 @@ function moveHostiles(){
     for(hostile=0;hostile<this.hostiles.locations.length;hostile++){
 		thisHostileNeighbors = this.world.neighborsStatus(this.hostiles.locations[hostile]);
 		if (thisHostileNeighbors[3]>3){
-				this.hostiles.kill(this.hostiles.locations[hostile]["x"], this.hostiles.locations[hostile]["y"]);				
-		} else if (thisHostileNeighbors[1]>0 || (thisHostileNeighbors[3]>=1 && thisHostileNeighbors[3]<=3)){
+				this.world.map[this.hostiles.locations[hostile]["x"]][this.hostiles.locations[hostile]["y"]]=0;
+				this.hostiles.kill(this.hostiles.locations[hostile]["x"], this.hostiles.locations[hostile]["y"]);
+				
+		} else if ((thisHostileNeighbors[3]>=1 && thisHostileNeighbors[3]<=3) || randomNum(1,10)===1){
 			randomNeighbor=this.world.randomNonOther(this.hostiles.locations[hostile]);
 			if (this.world.map[randomNeighbor["x"]][randomNeighbor["y"]]==0){
 				this.world.map[this.hostiles.locations[hostile]["x"]][this.hostiles.locations[hostile]["y"]]=0;
@@ -218,9 +241,7 @@ function moveHostiles(){
 			} else if (this.world.map[randomNeighbor["x"]][randomNeighbor["y"]]==1){
 
 			} else if (this.world.map[randomNeighbor["x"]][randomNeighbor["y"]]==3){
-				otherHostileNeighbors = this.world.neighborsStatus(randomNeighbor);
-				
-				
+				otherHostileNeighbors = this.world.neighborsStatus(randomNeighbor);								
 				if (otherHostileNeighbors[0]+thisHostileNeighbors[3]>5){
 					randomOpen=this.world.randomOpen(this.hostiles.locations[hostile]);
 					if (randomOpen!==false){
@@ -242,7 +263,6 @@ function queenTouched(){
 			this.world.map[this.queen.pos["x"]][this.queen.pos["y"]]=5;
 			this.world.map[queenSpawn["x"]][queenSpawn["y"]]=4;
 			this.babies.add(this.queen.pos);
-			console.log(this.babies.locations);
 			this.queen.move(queenSpawn);
 			
 
@@ -252,3 +272,13 @@ function queenTouched(){
 	
 }
 
+function updateStatus(){
+	time = new Date();
+	duration = time.getTime()-this.begin_time;
+	$("#status_div").html("Move:" + this.num_of_moves + " Time:" + Math.floor(duration/1000) 
+		+ " Hostiles:" + this.hostiles.locations.length + " Friendlies:" + this.babies.locations.length);
+		
+	if (this.babies.locations.length>this.hostiles.locations.length){
+		$("#win_div").show();
+	}
+}

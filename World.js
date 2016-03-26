@@ -1,11 +1,14 @@
 function World (sizeOfX, sizeOfY){
 	this.sizeOfX = sizeOfX;
 	this.sizeOfY = sizeOfY;
-
+	this.directions = ["n", "e", "s", "w"];
+	
 	this.display = displayWorld;
+	this.findHostiles = whichWayToHostiles;
 	this.okayForTheQueen = isItOkayForTheQueen;
 	this.randomSpawnPoint = randomSpawnPoint;
 	this.farSpawn = fetchFarSpawn;
+	this.look = look;
 	this.neighbors = listNeighbors;
 	this.neighborsStatus = neighborsStatus;
 	this.randomNonOther = fetchRandomNonOther;
@@ -58,11 +61,11 @@ function displayWorld (){
 
 				worldString = worldString + "";
 			} else if (this.map[x][y]==3){
-				worldString = worldString + "&Delta;";
+				worldString = worldString + "&nabla;";
 			} else if (this.map[x][y]==4){
 				worldString = worldString + "";
 			} else if (this.map[x][y]==5){
-				worldString = worldString + "O";
+				worldString = worldString + "&Delta;";
 			}
 			worldString = worldString + "</span>";
 		}
@@ -105,7 +108,6 @@ function isItOkayForTheQueen(location){
 	return false;
 }
 function listNeighbors(location){
-	console.log(location);
 	neighbors=new Array();
 	for(x=location["x"]-1;x<=location["x"]+1;x++){
 		for(y=location["y"]-1;y<=location["y"]+1;y++){
@@ -121,7 +123,7 @@ function listNeighbors(location){
 }
 
 function neighborsStatus(location){
-	console.log(location);
+
 	neighbors=this.neighbors(location);
 	neighborStatus=[];
 	for (i=0;i<10;i++){
@@ -202,4 +204,47 @@ function fetchRandomOpen(location){
 		tries++;
 	}
 	return neighbors[randomNumber];
+}
+
+function look(location, direction){
+	if (direction==="n"){
+		for(y=location["y"]-1;y>=1;y--){
+			if (this.map[location["x"]][y]!=0){
+				return this.map[location["x"]][y];
+			}
+		}
+		return false;
+	} else if (direction==="e"){
+		for(x=location["x"]+1;x<this.sizeOfX;x++){
+			if (this.map[x][location["y"]]!=0){
+				return this.map[x][location["y"]];
+			}
+		}
+		return false;
+	} else if (direction==="s"){
+		for(y=location["y"]+1;y<this.sizeOfY;y++){
+			if (this.map[location["x"]][y]!=0){
+				return this.map[location["x"]][y];
+			}
+		}
+		return false;
+	} else if (direction==="w"){
+		for(x=location["x"]-1;x>1;x--){
+			if (this.map[x][location["y"]]!=0){
+				return this.map[x][location["y"]];
+			}
+		}
+		return false;
+	}
+}
+
+function whichWayToHostiles(location){
+	for (i in this.directions){
+		direction = this.directions[i];
+		if (this.look(location, direction)===3){
+			return direction;
+		}
+	}
+
+	return false;
 }
